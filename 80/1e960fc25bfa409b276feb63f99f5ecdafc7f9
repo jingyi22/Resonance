@@ -1,0 +1,44 @@
+frontend/src/hooks/useResonance.ts
+  s_a63c81cacb06b2::t_183ebef8b14979 2
+  s_a63c81cacb06b2::t_afb84a70799aa9 70-78
+README.md
+  s_a63c81cacb06b2::t_26c1cc42937a9f 48
+  s_a63c81cacb06b2::t_806d67330e79fc 198
+  s_a63c81cacb06b2::t_3390b1f9579d2a 142-155
+frontend/src/App.tsx
+  s_a63c81cacb06b2::t_215bef859815f4 29
+  s_a63c81cacb06b2::t_ea4eeb58d62fb7 8
+frontend/src/components/common/Layout.tsx
+  s_a63c81cacb06b2::t_29307efeafac0a 90
+  s_a63c81cacb06b2::t_2505014f2b77fc 7
+cli/resonance.py
+  s_a63c81cacb06b2::t_fba12488691ed8 20-25
+frontend/src/pages/ResonanceScanAll.tsx
+  s_a63c81cacb06b2::t_08fbae52337a4f 1-130
+frontend/src/api/types/resonance.ts
+  s_a63c81cacb06b2::t_782a66888763f0 85-103
+frontend/src/api/client.ts
+  s_a63c81cacb06b2::t_e10be8fc8baf80 112-115
+  s_a63c81cacb06b2::t_6fbe65efec43be 1
+frontend/src/pages/Resonance.tsx
+  s_a63c81cacb06b2::t_3e608acd304125 21-22
+  s_a63c81cacb06b2::t_0de14190c823c5 2
+backend/resonance/api.py
+  s_a63c81cacb06b2::t_fd55e0d73cc97f 44-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.44-trip",
+  "base_commit_sha": "801e960fc25bfa409b276feb63f99f5ecdafc7f9",
+  "prompts": {},
+  "sessions": {
+    "s_a63c81cacb06b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b72cbd3e-a4db-4504-ba4e-0cc16b2531fa",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Elena Lu （陆靖沂） <elenalu@trip.com>"
+    }
+  }
+}

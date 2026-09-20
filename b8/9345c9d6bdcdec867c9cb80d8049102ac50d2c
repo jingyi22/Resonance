@@ -1,0 +1,38 @@
+frontend/vite.config.ts
+  s_1ed1f76a53fccb::t_965212a59ef774 6-7,14
+frontend/index.html
+  s_1ed1f76a53fccb::t_dc357c304792a0 10-18
+  s_1ed1f76a53fccb::t_d727d17cd9ecf8 7-9,19-21
+.github/workflows/deploy-frontend.yml
+  s_1ed1f76a53fccb::t_d9208aec85a245 1-58
+README.md
+  s_1ed1f76a53fccb::t_bcdf30544af1cd 217-254
+frontend/src/vite-env.d.ts
+  s_1ed1f76a53fccb::t_5949d0f8e570fa 5-6
+backend/main.py
+  s_1ed1f76a53fccb::t_eedd18fd99ebe4 5
+  s_1ed1f76a53fccb::t_6f9c3ff02f8557 32-37,40
+frontend/public/404.html
+  s_1ed1f76a53fccb::t_6bcf790889b871 3,7,9
+  s_1ed1f76a53fccb::t_5643e7c04b1eb7 18-20,24-25
+  s_1ed1f76a53fccb::t_411799460149e0 4-6,8,10,17,21-23
+  s_1ed1f76a53fccb::t_eae0f2b1a8416c 1-2,11-16,26-29
+frontend/src/api/client.ts
+  s_1ed1f76a53fccb::t_3e91306a609e7d 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.44-trip",
+  "base_commit_sha": "b89345c9d6bdcdec867c9cb80d8049102ac50d2c",
+  "prompts": {},
+  "sessions": {
+    "s_1ed1f76a53fccb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "441929b3-1a83-42d0-8964-79ee9ee9a8df",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Elena Lu （陆靖沂） <elenalu@trip.com>"
+    }
+  }
+}

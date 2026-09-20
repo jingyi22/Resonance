@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!--
+  GitHub Pages 是纯静态托管, 找不到深链接对应文件时会回落到这个 404.html。
+  标准做法(https://github.com/rafgraph/spa-github-pages): 把原始路径转成查询串
+  跳回站点根路径; index.html 里的还原脚本再用 pushState 把地址栏改回原始路径,
+  交给前端路由(BrowserRouter)接管。
+
+  pathSegmentsToKeep=1: 本项目部署为 GitHub Pages 项目站点(username.github.io/Resonance/),
+  仓库名占 1 段路径。若改成自定义域名/用户站点(根路径部署, VITE_APP_BASE 留空),
+  需把这个值改成 0。
+-->
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ETF买卖分析</title>
+    <script type="text/javascript">
+      var pathSegmentsToKeep = 1
+      var l = window.location
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      )
+    </script>
+  </head>
+  <body></body>
+</html>

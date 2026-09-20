@@ -214,3 +214,41 @@ cd etf-monitor
 将 `cli/qoderwork-prompt.md` 的内容交给 Qoderwork，它即可定期巡检并在触发共振时通过 IM 通知。
 
 ---
+
+## 九、云端部署（可选，多端访问）
+
+本项目默认是本地单机设计，若想要一个手机/平板/电脑均可直接打开的链接，可按「前端 GitHub Pages
++ 后端 Render 免费层」分离部署。这是最省钱的方案，但有明确代价（见下）。
+
+### 1. 部署后端（Render）
+
+1. [render.com](https://render.com) 注册账号，New → Web Service，选择本仓库。
+2. Build Command：`pip install -r backend/requirements.txt`
+3. Start Command：`cd backend && python -m uvicorn main:app --host 0.0.0.0 --port $PORT`
+4. 环境变量：
+   - `CORS_ORIGINS`：填第 2 步拿到的 GitHub Pages 域名（如 `https://<username>.github.io`），
+     多个域名用逗号分隔。留空则只允许本地 `localhost:5174` 访问。
+   - `ETF_MONITOR_HOME`（可选）：显式指定数据目录，便于排查，如 `/opt/render/project/.etf-monitor`。
+5. 部署成功后会拿到一个形如 `https://xxx.onrender.com` 的后端地址，下一步要用到。
+
+### 2. 部署前端（GitHub Pages）
+
+1. 仓库 Settings → Pages → Source 选 "GitHub Actions"。
+2. 仓库 Settings → Secrets and variables → Actions → Variables，新增
+   `VITE_API_BASE_URL` = 第 1 步拿到的 Render 后端地址（不带末尾斜杠）。
+3. push 到 `main` 分支（或手动触发 `.github/workflows/deploy-frontend.yml`），Actions 会自动
+   `npm run build` 并发布到 GitHub Pages，几分钟后即可通过
+   `https://<username>.github.io/<repo>/` 访问。
+
+### 3. 已知限制
+
+- **免费层数据会丢**：Render 免费 Web Service 无请求会休眠，容器重启/重新部署时本地磁盘上的
+  SQLite 数据库随之清空。唤醒后需要到前端「数据管理」页重新点「一键重建」补数据。
+- **定时任务不保证按时触发**：APScheduler 是进程内内存态调度，容器休眠期间的收盘分析、份额
+  抓取等定时任务会被错过，需要有请求进来把服务唤醒后手动触发补齐。
+- **数据源可能被境外 IP 限流**：akshare/腾讯/东财/雪球等接口面向国内网络优化，云平台机房出口
+  IP 若被识别为境外，可能出现请求变慢、超时或返回空，需部署后通过日志实测确认。
+- 如需长期稳定运行，建议升级 Render 付费层并挂载 Persistent Disk，或迁移到境内云主机
+  （见下方「一键启动」章节，效果最接近本地体验）。
+
+---

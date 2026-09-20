@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { useResonanceDay } from '../../hooks/useResonance'
 import EvidenceCard from './EvidenceCard'
 
@@ -19,6 +20,12 @@ export default function ResonanceEvidencePanel({ code, selection, onClose }: {
 }) {
   const { data, isFetching } = useResonanceDay(code, selection?.date ?? null)
   const current = selection && data && data.date === selection.date ? data : null
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  // 面板在页面底部, 点击顶部指示灯后无滚动则用户看不到任何反应(误以为点击无效)
+  useEffect(() => {
+    if (selection) panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [selection])
 
   if (!selection) {
     return (
@@ -30,7 +37,7 @@ export default function ResonanceEvidencePanel({ code, selection, onClose }: {
   }
 
   return (
-    <div className="bg-gray-950 border border-gray-800 rounded-lg p-4">
+    <div ref={panelRef} className="bg-gray-950 border border-gray-800 rounded-lg p-4">
       <div className="flex items-center gap-3 flex-wrap mb-4">
         <h3 className="text-base font-bold text-white">归因详情</h3>
         <span className="text-sm text-gray-400 font-mono">{selection.date}</span>

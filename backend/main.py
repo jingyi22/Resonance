@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -28,9 +29,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="ETF 买卖分析系统", version="1.0.0", lifespan=lifespan)
+_cors_origins = os.environ.get("CORS_ORIGINS")
+allow_origins = (
+    [o.strip() for o in _cors_origins.split(",") if o.strip()]
+    if _cors_origins
+    else ["http://localhost:5174", "http://127.0.0.1:5174"]
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5174", "http://127.0.0.1:5174"],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

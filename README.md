@@ -14,6 +14,9 @@
 ### 1. 为什么看 ETF
 国家队救市/护盘时，通常通过申购宽基 ETF（沪深300、上证50、中证500/1000、科创50 等）
 间接入市。ETF 的**份额变化**、**量价配合**、**折溢价**是观测其动作的高信噪比窗口。
+除宽基外，白名单还覆盖算力/AI、有色金属、电力、军工、半导体、光伏、新能源、银行、
+医药、白酒、房地产、煤炭、钢铁等 39 只 ETF，覆盖主要行业板块，便于轮动扫描捕捉
+板块级资金动向。
 
 ### 2. 三因子 → 五指标 → 共振
 系统从三个维度刻画资金行为，再叠加两个市场情绪维度，共五个指标各亮一盏灯：
@@ -45,6 +48,7 @@
 
 - **盘中实时信号**：交易时段每 30 秒轮询行情，计算三因子合成概率与信号等级。
 - **多指标共振**：五指标红绿灰灯 + 历史热力图，点击任意日期可看逐指标判定依据。
+- **轮动扫描**：一次性扫描全部 ETF 白名单，按当日共振结果分组排名，快速定位机会/危险标的（见下）。
 - **市场情绪分区**：两市成交额（MA5 平滑）与融资余额的滚动分位，划分危险/中性/安全区。
 - **数据管理页**：所有数据拉取/生成收敛为后台任务 + 实时进度，支持「一键重建」全量数据。
 - **定时任务**：内置 APScheduler，自动增量拉取日线、份额、情绪、交易日历。
@@ -110,7 +114,7 @@ etf-monitor/
 │   ├── base/              # 跨页共用（页面领域间下沉）
 │   │   ├── config.py      # 全部可调常量（ETF清单/阈值/窗口/限流）
 │   │   ├── fetch/         # 数据源请求与解析（腾讯/akshare）
-│   │   ├── analysis/      # 纯函数：sentiment/ + strategy/（8只ETF策略+router）
+│   │   ├── analysis/      # 纯函数：sentiment/ + strategy/（少数ETF专属策略+router，其余走默认策略）
 │   │   ├── store/         # SQLite 访问层（database + 各表 repo）
 │   │   ├── scheduler/     # tasks/intraday_tasks/daily_tasks/state/job_manager/
 │   │   │                  #   job_registry/data_jobs/sentiment_jobs/rebuild/recalc/time_guard
@@ -138,7 +142,20 @@ etf-monitor/
 
 ---
 
-## 六、快速开始
+## 六、轮动扫描
+
+单只 ETF 的共振页只能盯着一个代码看灯，轮动扫描把 `config.py` 白名单里的全部 ETF
+一次算完，按当日判定结果分三组排名，绿灯多的机会共振标的排在最前：
+
+- 接口：`GET /api/resonance/scan-all`，返回 `opportunity_resonance` / `danger_resonance` / `neutral`
+  三个分组数组，组内分别按绿灯数、红灯数降序排列；单个 ETF 数据缺失时跳过而不影响整体返回。
+- 页面：前端「轮动扫描」（`/resonance/scan-all`），点击任意一行跳转到该 ETF 的共振详情页
+  （`/resonance?code=xxx`）。
+- CLI：`cli/resonance.py --all` 同样遍历全部 ETF，输出摘要或 `--json` 结构化结果。
+
+---
+
+## 七、快速开始
 
 ### 一键启动（推荐）
 全新克隆后，直接运行：
@@ -181,7 +198,7 @@ python3 scripts/backfill_shares.py 140  # 份额
 
 ---
 
-## 七、CLI（供外部 Agent / IM 通知）
+## 八、CLI（供外部 Agent / IM 通知）
 
 `cli/resonance.py` 直接读取本地数据库，**无需启动 Web 服务**：
 
@@ -195,5 +212,43 @@ cd etf-monitor
 ```
 
 将 `cli/qoderwork-prompt.md` 的内容交给 Qoderwork，它即可定期巡检并在触发共振时通过 IM 通知。
+
+---
+
+## 九、云端部署（可选，多端访问）
+
+本项目默认是本地单机设计，若想要一个手机/平板/电脑均可直接打开的链接，可按「前端 GitHub Pages
++ 后端 Render 免费层」分离部署。这是最省钱的方案，但有明确代价（见下）。
+
+### 1. 部署后端（Render）
+
+1. [render.com](https://render.com) 注册账号，New → Web Service，选择本仓库。
+2. Build Command：`pip install -r backend/requirements.txt`
+3. Start Command：`cd backend && python -m uvicorn main:app --host 0.0.0.0 --port $PORT`
+4. 环境变量：
+   - `CORS_ORIGINS`：填第 2 步拿到的 GitHub Pages 域名（如 `https://<username>.github.io`），
+     多个域名用逗号分隔。留空则只允许本地 `localhost:5174` 访问。
+   - `ETF_MONITOR_HOME`（可选）：显式指定数据目录，便于排查，如 `/opt/render/project/.etf-monitor`。
+5. 部署成功后会拿到一个形如 `https://xxx.onrender.com` 的后端地址，下一步要用到。
+
+### 2. 部署前端（GitHub Pages）
+
+1. 仓库 Settings → Pages → Source 选 "GitHub Actions"。
+2. 仓库 Settings → Secrets and variables → Actions → Variables，新增
+   `VITE_API_BASE_URL` = 第 1 步拿到的 Render 后端地址（不带末尾斜杠）。
+3. push 到 `main` 分支（或手动触发 `.github/workflows/deploy-frontend.yml`），Actions 会自动
+   `npm run build` 并发布到 GitHub Pages，几分钟后即可通过
+   `https://<username>.github.io/<repo>/` 访问。
+
+### 3. 已知限制
+
+- **免费层数据会丢**：Render 免费 Web Service 无请求会休眠，容器重启/重新部署时本地磁盘上的
+  SQLite 数据库随之清空。唤醒后需要到前端「数据管理」页重新点「一键重建」补数据。
+- **定时任务不保证按时触发**：APScheduler 是进程内内存态调度，容器休眠期间的收盘分析、份额
+  抓取等定时任务会被错过，需要有请求进来把服务唤醒后手动触发补齐。
+- **数据源可能被境外 IP 限流**：akshare/腾讯/东财/雪球等接口面向国内网络优化，云平台机房出口
+  IP 若被识别为境外，可能出现请求变慢、超时或返回空，需部署后通过日志实测确认。
+- 如需长期稳定运行，建议升级 Render 付费层并挂载 Persistent Disk，或迁移到境内云主机
+  （见下方「一键启动」章节，效果最接近本地体验）。
 
 ---

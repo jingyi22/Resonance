@@ -37,6 +37,7 @@ ETFS = {
     "516160": {"name": "南方中证新能源ETF", "idx": "新能源", "market": "sh"},
     "512800": {"name": "华宝中证银行ETF", "idx": "银行", "market": "sh"},
     "512170": {"name": "华宝中证医疗ETF", "idx": "医药", "market": "sh"},
+    "159992": {"name": "创新药ETF银华", "idx": "创新药", "market": "sz"},
     "512690": {"name": "鹏华中证酒ETF", "idx": "白酒", "market": "sh"},
     "159736": {"name": "天弘中证食品饮料ETF", "idx": "食品饮料", "market": "sz"},
     "512200": {"name": "南方中证全指房地产ETF", "idx": "房地产", "market": "sh"},

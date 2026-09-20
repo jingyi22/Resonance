@@ -1,0 +1,36 @@
+backend/base/scheduler/shares_jobs.py
+  s_1ed1f76a53fccb::t_cabbeca06306aa 254
+  s_1ed1f76a53fccb::t_26e66a14e027e9 99-101
+  s_1ed1f76a53fccb::t_fad2d6ab65b5f3 182
+  s_1ed1f76a53fccb::t_3c8d741e79cd34 29
+backend/base/config.py
+  s_1ed1f76a53fccb::t_daa9ed6bdfce38 27-49
+frontend/src/components/common/EtfSelector.tsx
+  s_1ed1f76a53fccb::t_875b61394e5d35 109-161,163-164
+  s_1ed1f76a53fccb::t_0f84792f35d348 15,35-38,41-56
+frontend/src/pages/ResonanceScanAll.tsx
+  s_1ed1f76a53fccb::t_57b0cc9dbd9293 1
+  s_1ed1f76a53fccb::t_eb1b0cc6a8d92d 90-94,98
+  s_1ed1f76a53fccb::t_9b6b01977070e9 119-123,133-139,143-145
+README.md
+  s_1ed1f76a53fccb::t_64e1976280889d 117
+  s_1ed1f76a53fccb::t_3b30060dd7e8ae 17-19
+backend/base/store/daily_repo.py
+  s_1ed1f76a53fccb::t_3eb1c0d9c6bf67 257-274
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.44-trip",
+  "base_commit_sha": "3538fdf6d3b07bd327d8f600cb733f2741d65f47",
+  "prompts": {},
+  "sessions": {
+    "s_1ed1f76a53fccb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "441929b3-1a83-42d0-8964-79ee9ee9a8df",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Elena Lu （陆靖沂） <elenalu@trip.com>"
+    }
+  }
+}

@@ -24,10 +24,19 @@ export default function Resonance() {
   const [selected, setSelected] = useState<ResonanceSelection | null>(null)
   const [dateWindow, setDateWindow] = useState<DateWindow | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [slowLoad, setSlowLoad] = useState(false)
   const bridge = useAxisPointerBridge()
   const queryClient = useQueryClient()
 
   const { data, isLoading, error, refetch } = useResonance(code)
+
+  // 免费层后端休眠后首次请求可能耗时较久, 加载超过阈值提示用户耐心等待
+  // (而非误以为页面卡死), 而不是让用户面对一个无解释的空白转圈
+  useEffect(() => {
+    if (!isLoading) { setSlowLoad(false); return }
+    const timer = setTimeout(() => setSlowLoad(true), 8000)
+    return () => clearTimeout(timer)
+  }, [isLoading])
   const { data: etfList } = useQuery({
     queryKey: ['etfList'],
     queryFn: fetchEtfList,
@@ -123,7 +132,16 @@ export default function Resonance() {
     )
   }
   if (isLoading || !data) {
-    return <div className="text-gray-400 text-center py-20">共振数据加载中...</div>
+    return (
+      <div className="text-gray-400 text-center py-20">
+        <div>共振数据加载中...</div>
+        {slowLoad && (
+          <div className="text-xs text-gray-600 mt-2">
+            首次访问或长时间未使用时，云端服务可能需要重新启动，请耐心等待最多一分钟
+          </div>
+        )}
+      </div>
+    )
   }
 
   const selectLight = (key: string) => {

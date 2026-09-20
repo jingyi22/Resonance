@@ -21,11 +21,23 @@ export interface CacheEntry<T> {
   schema: number
 }
 
+// 部分浏览器环境(如 Safari 隐私模式)下 indexedDB.open() 会永远不触发任何回调,
+// 既不 resolve 也不 reject。若无超时兜底, 依赖此 Promise 的 React Query queryFn
+// 永远不 settle, 页面卡在"加载中"且不会显示错误("始终处于加载中"bug 根因)。
+const IDB_TIMEOUT_MS = 3000
+
 let dbPromise: Promise<IDBDatabase> | null = null
+
+function withTimeout<T>(p: Promise<T>, label: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`IndexedDB timeout: ${label}`)), IDB_TIMEOUT_MS)
+    p.then(v => { clearTimeout(timer); resolve(v) }, e => { clearTimeout(timer); reject(e) })
+  })
+}
 
 function openDB(): Promise<IDBDatabase> {
   if (dbPromise) return dbPromise
-  dbPromise = new Promise((resolve, reject) => {
+  const p = new Promise<IDBDatabase>((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION)
     req.onupgradeneeded = () => {
       if (!req.result.objectStoreNames.contains(STORE)) {
@@ -35,26 +47,38 @@ function openDB(): Promise<IDBDatabase> {
     req.onsuccess = () => resolve(req.result)
     req.onerror = () => reject(req.error ?? new Error('IndexedDB open failed'))
   })
+  dbPromise = withTimeout(p, 'open').catch(err => { dbPromise = null; throw err })
   return dbPromise
 }
 
+// 缓存层是性能优化, 不是数据来源: 打开/读取失败(含超时)时静默降级为无缓存,
+// 不让 IndexedDB 故障阻塞真正的网络请求。
 export async function cacheGet<T>(key: string): Promise<CacheEntry<T> | null> {
-  const db = await openDB()
-  return new Promise((resolve, reject) => {
-    const req = db.transaction(STORE, 'readonly').objectStore(STORE).get(key)
-    req.onsuccess = () => resolve((req.result as CacheEntry<T> | undefined) ?? null)
-    req.onerror = () => reject(req.error ?? new Error('IndexedDB get failed'))
-  })
+  try {
+    const db = await openDB()
+    return await withTimeout(new Promise<CacheEntry<T> | null>((resolve, reject) => {
+      const req = db.transaction(STORE, 'readonly').objectStore(STORE).get(key)
+      req.onsuccess = () => resolve((req.result as CacheEntry<T> | undefined) ?? null)
+      req.onerror = () => reject(req.error ?? new Error('IndexedDB get failed'))
+    }), 'get')
+  } catch (e) {
+    console.warn('[idbCache] cacheGet 降级为无缓存:', e)
+    return null
+  }
 }
 
 export async function cacheSet<T>(key: string, entry: CacheEntry<T>): Promise<void> {
-  const db = await openDB()
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readwrite')
-    tx.objectStore(STORE).put(entry, key)
-    tx.oncomplete = () => resolve()
-    tx.onerror = () => reject(tx.error ?? new Error('IndexedDB set failed'))
-  })
+  try {
+    const db = await openDB()
+    await withTimeout(new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite')
+      tx.objectStore(STORE).put(entry, key)
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error ?? new Error('IndexedDB set failed'))
+    }), 'set')
+  } catch (e) {
+    console.warn('[idbCache] cacheSet 写入失败, 忽略:', e)
+  }
 }
 
 /** 清除全部缓存(数据管理页「清除缓存」按钮): 下次进入页面全量重拉 */

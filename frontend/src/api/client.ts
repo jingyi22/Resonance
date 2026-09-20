@@ -1,6 +1,8 @@
 import type { SignalResponse, EtfHistoryResponse, EtfInfo, RealtimeStatus, StatsResponse, SentimentOverview, SentimentRefreshResult, EtfRefreshResult, CalendarDays, CalendarRefreshResult, ResonanceOverview, ResonanceDayDetail, TradesResponse, ScanAllResponse, DataStatus, DataSettings, JobState, StartJobRequest, StartJobResponse, PortfolioBacktestResponse, RealtimeTurnoverResponse, ScheduledTaskInfo } from './types'
 
-const BASE = `${__API_BASE_URL__}${__APP_BASE__}/api`
+// __API_BASE_URL__ 非空 = 前后端分离部署(跨域后端根路径无子路径, 见 README「云端部署」);
+// 为空则同源部署, 子路径 __APP_BASE__ 由后端 mount_frontend 一并托管前端+API。二者互斥, 不可拼接。
+const BASE = __API_BASE_URL__ ? `${__API_BASE_URL__}/api` : `${__APP_BASE__}/api`
 
 async function parseError(res: Response): Promise<Error> {
   let msg = `API error: ${res.status}`

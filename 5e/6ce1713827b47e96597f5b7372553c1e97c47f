@@ -1,0 +1,22 @@
+frontend/src/utils/idbCache.ts
+  s_1ed1f76a53fccb::t_f78da708b425c1 24-28,31-37,40,50,54-55,57-67,71-81
+frontend/src/pages/Resonance.tsx
+  s_1ed1f76a53fccb::t_55b5f8f0c3757b 27,32-39
+  s_1ed1f76a53fccb::t_8d4ea8944a2121 135-144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.44-trip",
+  "base_commit_sha": "5e6ce1713827b47e96597f5b7372553c1e97c47f",
+  "prompts": {},
+  "sessions": {
+    "s_1ed1f76a53fccb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "441929b3-1a83-42d0-8964-79ee9ee9a8df",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Elena Lu （陆靖沂） <elenalu@trip.com>"
+    }
+  }
+}
